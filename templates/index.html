@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+
+{% block head %}
+<title>Co-op elections</title>
+<link rel="stylesheet" type="text/css" href="../static/css/admin.css">
+<script type="text/javascript" src="../static/js/index.js">
+</script>
+{% endblock %}
+
+
+{% block body %}
+<body>
+    <div class="votes">
+    <h1 style="display:inline">Co-op elections page</h1>
+    <object align="right"><a href="/admin">Admin ></a></object>
+    <hr class="top"/>
+    <h3>Ballot</h3>
+    {% if candidates|length < 1 %}
+        <h3>There are currently no candidates.</h3>
+    {% else %}
+    <table class="ordered">
+            <tr>
+                <th>Rank</th>
+                <th>Candidate Name</th>
+            </tr>
+
+            {% for i in range(numCandidate) %}
+                <tr>
+                    <td>{{i+1}}</td>
+                    <td id="rank{{i+1}}"></td>
+                </tr>
+            {% endfor %}
+
+    </table>
+
+    <br />
+
+    <input type="button" onclick="removeVote()" value="Remove candidate">
+    <input type="button" onclick="removeAllVotes({{numCandidate}})" value="Remove all candidates">
+
+    <br /><br />
+
+    <form onsubmit="return (validate('ballotCodeword', 'Codeword empty') && validateVotes('Need more votes', {{minNumCandidates}}))" action="/" method="POST">
+        Code word: <input type="text" id="ballotCodeword" name="ballotCodeword">
+        <input type="hidden" name="ballot" id="ballot">
+        <input type="submit" value="Submit ballot">
+    </form>
+
+    <p style="color:red;font-style:italic;" id="alert_area1">
+        &nbsp;
+    </p>
+    <p style="color:red;font-style:italic;" id="alert_area2">
+        &nbsp;
+    </p>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <p style="color:red;font-style:italic;">
+    {% for message in messages %}
+        {{ message }}
+    {% endfor %}
+    </p>
+    {% else %}
+        <br />
+    {% endif %}
+    {% endwith %}
+
+    <h3 id="candidate_list">Candidates</h3>
+    <table class="ordered">
+        {% for i, (key,name) in candidates %}
+            {% if not ((i)%3) %}
+                <tr>
+            {% endif %}
+                <td><a href="javascript:void(0)" onclick="addVote({{key}}, '{{name}}', {{numCandidate}})">{{name}}</a></td>
+            {% if not ((1+i)%3) %}
+                </tr>
+            {% endif %}
+        {% endfor %}
+        {% endif %}
+    </table>
+    </div>
+</body>
+{% endblock %}

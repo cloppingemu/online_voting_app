@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+
+{% block head %}
+<title>Admin Control Page</title>
+<link rel="stylesheet" type="text/css" href="../static/css/admin.css">
+<script type="text/javascript">
+    function validate(fieldName, validationAlert){
+        if(document.getElementById(fieldName).value == ""){
+            alert(validationAlert);
+            document.getElementById(fieldName).focus();
+            return false;
+        }
+        else{
+            return true;
+        }
+    }
+</script>
+{% endblock %}
+
+
+{% block body %}
+<body>
+    <h1 style="display:inline">Co-op election admin page</h1>
+    <object align="right"><a href="/logout">Logout</a></object><object align="right"><a href="/">< Home</a>&nbsp;&nbsp;</object>
+    <hr class="top"/>
+    <div class="candidates">
+
+    <h3 id="num_cndt_rnk">Currently collecting responses: {% if config["accepting"] %} yes {% else %} no {% endif %}</h3>
+    <form action="/admin/toggleAcceptingResponses" name="toggleAcceptingResponses" method="POST">
+        <input type="submit" value="Toggle form on/off">
+    </form>
+    <br />
+    <hr class="page"/>
+
+    <h3>Candidates</h3>
+    <form action="/admin/addName" onsubmit="return validate('candidateName', 'Name field empty')" name="addCandidateForm" method="POST">
+        <input type="text" name="candidateName" id="candidateName" tabindex=1>
+        <input type="submit" value="Add candidate" tabindex=2>
+    </form>
+    <a href="/admin/delete_all_candidates">Delete All Candidates</a>
+    <br /><br />
+    {% if config['candidates']|length < 1 %}
+        <b>There are currently no candidates.</b>
+    {% else %}
+    <table class="ordered">
+            <tr>
+                <th>Candidate Name</th>
+                <th>Actions</th>
+            </tr>
+
+            {% for num,name in config['candidates'].items() %}
+                <tr>
+                    <td>{{name}}</td>
+                    <td><a href="/admin/delCan/{{num}}"> Delete </a> <br />
+                        <a href="/admin/update/{{num}}"> Rename </a> </td>
+                </tr>
+            {% endfor %}
+
+    </table>
+    {% endif %}
+    <br /> <br />
+    <hr class="page"/>
+
+    <h3>Code-words</h3>
+    <form action="/admin/addCodeword" onsubmit="return validate('new_codeword', 'New codeword empty')" method="POST">
+        <input type="text" name="new_codeword" id="new_codeword" tabindex=3>
+        <input type="submit" value="Add codeword" tabindex=4>
+    </form>
+    <a href="/admin/delete_all_candidates">Delete All Candidates</a>
+    <br /><br />
+    {% if config['codewords']|length < 1 %}
+        <b>There are currently no codewords.</b>
+    {% else %}
+    <table class="ordered">
+            <tr>
+                <th>Codeword</th>
+                <th>Actions</th>
+            </tr>
+
+            {% for codeword in config['codewords'] %}
+                <tr>
+                    <td>{{codeword}}</td>
+                    <td><a href="/admin/delCode/{{codeword}}"> Delete </a></td>
+                </tr>
+            {% endfor %}
+
+    </table>
+    {% endif %}
+    <br /> <br />
+    <hr class="page"/>
+
+    <h3 id="num_cndt_rnk">Number of candidates to rank: {{config["rankNumCandidates"]}}</h3>
+    <form action="/admin/setNumber" onsubmit="return validate('numberCandidate', 'Number field empty')" name="numberCandidatesToRank" method="POST">
+        <input type="number" name="numberCandidate" id="numberCandidate" value={{config["rankNumCandidates"]}}>
+        <input type="submit" value="Set number to rank">
+    </form>
+    <br /> <br />
+    <hr class="page"/>
+
+    <h3 id="min_num_candt_rnk">Minimum number of candidates to rank: {{config["minCandidates"]}}</h3>
+    <form action="/admin/setMinNumber" onsubmit="return validate('minNumberCandidate', 'Minimum number field empty')" name="minNumberCandidatesToRank" method="POST">
+        <input type="number" name="minNumberCandidate" id="minNumberCandidate" value={{config["minCandidates"]}}>
+        <input type="submit" value="Set minimum number to rank">
+    </form>
+    <br /><br />
+    <hr class="page"/>
+
+    <h3 style="display:inline" id="casted_ballots">Casted ballots</h3>
+    {% if ballots|length >= 1 %}
+        <table class="unordered">
+            <tr>
+                <th>Time</th>
+                <th>Codeword</th>
+                <th>Order</th>
+                <th>Action<object align="right"><a href="/admin/results">evaluate</a></object></th>
+            </tr>
+            {% for ballot in ballots %}
+            <tr>
+                <td>{{ballot.date_created}}</td>
+                <td>{{ballot.codeword}}</td>
+                <td>{% for key in ballot.candidate_order.split(",") %}{{config['candidates'][key]}}, {% endfor %}</td>
+                <td><a href="/admin/delVote/{{ballot.key}}">Delete vote</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <b>There are currently no candidates.</b>
+    {% endif %}
+    <hr class="page"/>
+    </div>
+</body>
+{% endblock %}

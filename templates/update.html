@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+
+{% block head %}
+<title>Admin Control Page</title>
+<script type="text/javascript">
+function validate(){
+    if(document.getElementById("newCandidateName").value == ""){
+        alert("Name field empty.");
+        document.getElementById("newCandidateName").focus();
+        return false;
+    }
+    else{
+        return true;
+    }
+}
+</script>
+{% endblock %}
+
+
+{% block body %}
+<body onload="document.getElementById('newCandidateName').focus()">
+    <div class="candidates">
+        <h1>Rename a candidate</h1>
+        
+        <br /> <br />
+        <form action="/admin/update/{{key}}" onsubmit="return validate();" name="updateCandidateForm" method="POST">
+            <input type="text" name="newCandidateName" id="newCandidateName" value="{{candidate_to_rename}}">
+            <input type="submit" value="Update candidate">
+        </form>
+    </div>
+</body>
+{% endblock %}
