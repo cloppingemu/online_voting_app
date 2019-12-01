@@ -16,7 +16,7 @@
     <div class="candidates">
     
     <br />
-    <h3 style="display:inline">Password:</h3> <input type="text" id="admin_passwd" name="admin_passwd">
+    <h3 style="display:inline">Password:</h3> <input type="password" id="admin_passwd" name="admin_passwd">
     <form action="" method="POST" onsubmit="return update_salt('admin_passwd', 'salted_passwd', '{{passwd_salt}}')">
         <input type="hidden" id="salted_passwd" name="salted_passwd">
         <input type="submit" value="Login">
@@ -36,8 +36,8 @@
     {% endwith %}
 
     <p style="color:red;font-style:italic;" id="alert_text"> &nbsp; </p>
-    <b>Change password:</b> <input type="text" id="new_passwd" name="new_passwd"><br />
-    <b>Confirm new password: <input type="text" id="confirm_new_password" name="confirm_new_password" onkeyup="confirm_password_match()"> </b>
+    <b>Change password:</b> <input type="password" id="new_passwd" name="new_passwd"><br />
+    <b>Confirm new password: <input type="password" id="confirm_new_password" name="confirm_new_password" onkeyup="confirm_password_match()"> </b>
     <form action="" method="POST" onsubmit="return validate_new_password('confirm_new_password', 'new_salted_passwd', '{{new_salt}}', '{{passwd_salt}}')">
     <input type="hidden" id="old_salted_passwd" name="old_salted_passwd">
     <input type="hidden" id="new_passwd_salt" name="new_passwd_salt">
