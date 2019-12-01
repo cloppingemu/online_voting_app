@@ -9,6 +9,7 @@ function validate(fieldName, validationAlert){
     }
 }
 
+
 function sha256(ascii) {
     // Thanks to following for the javascript implementation of sha256
     // https://geraintluff.github.io/sha256/

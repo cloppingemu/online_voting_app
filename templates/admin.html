@@ -4,6 +4,7 @@
 {% block head %}
 <title>Admin Control Page</title>
 <link rel="stylesheet" type="text/css" href="../static/css/admin.css">
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script type="text/javascript">
     function validate(fieldName, validationAlert){
         if(document.getElementById(fieldName).value == ""){
@@ -21,6 +22,19 @@
 
 {% block body %}
 <body>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type=text/javascript>
+            $(function() {
+                $('a#btn_update_site').bind('click', function() {
+                $.getJSON('/update_site',
+                    function(data) {
+                    // Do nothing.
+                });
+                return false;
+                });
+            });
+    </script>
+
     <h1 style="display:inline">Co-op election admin page</h1>
     <object align="right"><a href="/logout">Logout</a></object><object align="right"><a href="/">< Home</a>&nbsp;&nbsp;</object>
     <hr class="top"/>
@@ -31,6 +45,12 @@
         <input type="submit" value="Toggle form on/off">
     </form>
     <br />
+    <hr class="page"/>
+
+    <h3 id="hr_update_site" style="display:inline">Update website to:</h3> <a href="https://github.com/cloppingemu/online_voting_app">https://github.com/cloppingemu/online_voting_app</a>
+    <br /><br />
+        <a href=# id="btn_update_site"><button class="btn_default">Update site</button></a>
+    <br /><br />
     <hr class="page"/>
 
     <h3>Candidates</h3>

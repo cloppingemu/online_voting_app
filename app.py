@@ -1,6 +1,7 @@
 import random
 import json
 import hashlib
+import os
 import flask
 from flask_sqlalchemy import SQLAlchemy
 import datetime, time
@@ -70,9 +71,8 @@ def index():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
     if not config_dict['accepting']:
-        return "This form is no longer collection response. <br />"\
-               "If you believe this is a mistake, please email "\
-               "<a href='mailto:contact@csh.coop'>contact@csh.coop</a>."
+        return flask.render_template("voting_closed.html",
+            current_year=datetime.datetime.utcnow().year)
     if flask.request.method == "POST":
         ballot_codeword = flask.request.form["ballotCodeword"]
         if ballot_codeword not in config_dict['codewords']:
@@ -98,7 +98,14 @@ def index():
 
 @app.route("/voted")
 def voted():
-    return flask.render_template("voted.html")
+    return flask.render_template("voted.html",
+        current_year=datetime.datetime.utcnow().year)
+
+
+@app.route("/update_site")
+def update_site():
+    os.system("bash ../update-site.sh")
+    return ""
 
 
 @app.route("/admin")
