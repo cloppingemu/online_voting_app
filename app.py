@@ -119,9 +119,12 @@ def admin():
         return flask.redirect("/login")
     flask.session["admin"] = int(time.time())
 
+    with open("last_update") as luFile:
+        last_update = "".join(luFile.readlines())
     ballots = Votes.query.order_by(Votes.date_created).all()
     return flask.render_template("admin.html", config=config_dict,
-                                 ballots=ballots)
+                                 ballots=ballots,
+                                 last_update=last_update)
 
 
 
