@@ -102,10 +102,10 @@ def voted():
         current_year=datetime.datetime.utcnow().year)
 
 
-@app.route("/update_site")
+@app.route("/admin/update_site", methods=["POST"])
 def update_site():
     os.system("bash ../update-site.sh")
-    return ""
+    return flask.redirect("/admin")
 
 
 @app.route("/admin")

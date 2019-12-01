@@ -22,19 +22,6 @@
 
 {% block body %}
 <body>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script type=text/javascript>
-            $(function() {
-                $('a#btn_update_site').bind('click', function() {
-                $.getJSON('/update_site',
-                    function(data) {
-                    // Do nothing.
-                });
-                return false;
-                });
-            });
-    </script>
-
     <h1 style="display:inline">Co-op election admin page</h1>
     <object align="right"><a href="/logout">Logout</a></object><object align="right"><a href="/">< Home</a>&nbsp;&nbsp;</object>
     <hr class="top"/>
@@ -49,7 +36,9 @@
 
     <h3 id="hr_update_site" style="display:inline">Update website to:</h3> <a href="https://github.com/cloppingemu/online_voting_app">https://github.com/cloppingemu/online_voting_app</a>
     <p><b>Last updated:</b> {{last_update}}</p>
-        <a href=# id="btn_update_site"><button class="btn_default">Update site</button></a>
+    <form action="/admin/update_site" method="POST">
+        <button type="submit">Update site</button>
+    </form>
     <br /><br />
     <hr class="page"/>
 
