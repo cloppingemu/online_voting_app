@@ -9,7 +9,7 @@ import datetime, time
 
 # %%
 
-__app__version__ = "0.1.2"
+__app__version__ = "0.1.0"
 salt_base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 
