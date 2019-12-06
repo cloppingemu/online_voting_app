@@ -9,6 +9,7 @@ import datetime, time
 
 # %%
 
+__app__version__ = "0.1.0"
 salt_base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 
@@ -96,7 +97,8 @@ def index():
                 random.sample(config_dict['candidates'].items(),
                 len(config_dict['candidates'])))),
             numCandidate=config_dict['rankNumCandidates'],
-            minNumCandidates=config_dict['minCandidates'])
+            minNumCandidates=config_dict['minCandidates'],
+            version=__app__version__)
 
 
 @app.route("/voted")
@@ -391,3 +393,6 @@ def delVote(key):
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+# %%
