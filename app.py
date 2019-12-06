@@ -79,6 +79,9 @@ def index():
             flask.flash("!! Bad codeword")
             return flask.redirect("/")
         ballot_order = flask.request.form["ballot"]
+        if len(ballot_order.split(",")) < config_dict["minCandidates"]:
+            flask.flash("!! Needed more votes")
+            return flask.redirect("/")
         new_ballot = Votes(codeword=ballot_codeword,
                            candidate_order=ballot_order)
         try:
