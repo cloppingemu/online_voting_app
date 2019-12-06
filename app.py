@@ -9,7 +9,7 @@ import datetime, time
 
 # %%
 
-__app__version__ = "0.1.1"
+__app_version__ = "0.1.2"
 salt_base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 
@@ -98,7 +98,7 @@ def index():
                 len(config_dict['candidates'])))),
             numCandidate=config_dict['rankNumCandidates'],
             minNumCandidates=config_dict['minCandidates'],
-            version=__app__version__)
+            version=__app_version__)
 
 
 @app.route("/voted")
