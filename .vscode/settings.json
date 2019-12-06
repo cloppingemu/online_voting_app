@@ -1,5 +1,0 @@
-{
-    "python.pythonPath": "env/bin/python3.8",
-    "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true
-}
