@@ -5,3 +5,5 @@ last_update
 .vscode/
 wsgi.py
 app.yaml
+ballots.csv
+constituencies.csv

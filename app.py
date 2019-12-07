@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 import datetime, time
 from functools import wraps
 
-# %%
+# %% app base
 
 __app_version__ = "0.1.4"
 salt_base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
@@ -44,14 +44,14 @@ def create_new_pass_config(passwd, passwd_salt=None, local_salt=None):
 
 
 
-# %%
+# %% app config
 
 app = flask.Flask(__name__)
 app.config["SECRET_KEY"] = "".join([random.choice(salt_base) for _ in range(128)])
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///votes.db"
 db = SQLAlchemy(app)
 
-# %%
+# %% models
 
 
 class Votes(db.Model):
@@ -62,6 +62,11 @@ class Votes(db.Model):
 
     def __repr__(self):
         return "<Vote, codeword:{}, candidate_order:{}, date_created:{}>".format(self.codeword, self.candidate_order, self.date_created)
+
+
+# %%
+
+
 
 
 # %%
@@ -357,3 +362,4 @@ def delVote(key):
 
 if __name__ == "__main__":
     app.run(debug=True)
+
