@@ -9,7 +9,7 @@ from functools import wraps
 
 # %%
 
-__app_version__ = "0.1.3"
+__app_version__ = "0.1.4"
 salt_base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 
@@ -67,6 +67,21 @@ class Votes(db.Model):
 # %%
 
 
+def login_required(func):
+    @wraps(func)
+    def inner(*args, **kwargs):
+        if "admin" not in flask.session:
+            flask.flash('You need to login first')
+            return flask.redirect("/login")
+        if int(time.time()) - flask.session["admin"] > 300:
+            flask.session.clear()
+            flask.flash("!! Time out")
+            return flask.redirect("/login")
+        flask.session["admin"] = int(time.time())
+        return func(*args, **kwargs)
+    return inner
+
+
 @app.route("/", methods=["POST", "GET"])
 def index():
     with open("config.json", "r") as configFile:
@@ -105,21 +120,6 @@ def index():
 def voted():
     return flask.render_template("voted.html",
         current_year=datetime.datetime.utcnow().year)
-
-
-def login_required(func):
-    @wraps(func)
-    def inner(*args, **kwargs):
-        if "admin" not in flask.session:
-            flask.flash('You need to login first')
-            return flask.redirect("/login")
-        if int(time.time()) - flask.session["admin"] > 300:
-            flask.session.clear()
-            flask.flash("!! Time out")
-            return flask.redirect("/login")
-        flask.session["admin"] = int(time.time())
-        return func(*args, **kwargs)
-    return inner
 
 
 @app.route("/admin")

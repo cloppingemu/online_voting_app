@@ -1,4 +1,7 @@
+.gitignore
 env/
 __pycache__/
 last_update
 .vscode/
+wsgi.py
+app.yaml
