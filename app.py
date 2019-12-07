@@ -5,11 +5,11 @@ import os
 import flask
 from flask_sqlalchemy import SQLAlchemy
 import datetime, time
-
+from functools import wraps
 
 # %%
 
-__app_version__ = "0.1.2"
+__app_version__ = "0.1.3"
 salt_base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 
@@ -107,30 +107,44 @@ def voted():
         current_year=datetime.datetime.utcnow().year)
 
 
-@app.route("/admin/update_site", methods=["POST"])
-def update_site():
-    os.system("bash ../update-site.sh")
-    return flask.redirect("/admin")
+def login_required(func):
+    @wraps(func)
+    def inner(*args, **kwargs):
+        if "admin" not in flask.session:
+            flask.flash('You need to login first')
+            return flask.redirect("/login")
+        if int(time.time()) - flask.session["admin"] > 300:
+            flask.session.clear()
+            flask.flash("!! Time out")
+            return flask.redirect("/login")
+        flask.session["admin"] = int(time.time())
+        return func(*args, **kwargs)
+    return inner
 
 
 @app.route("/admin")
+@login_required
 def admin():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
-    if "admin" not in flask.session:
-        return flask.redirect("/login")
-    if int(time.time()) - flask.session["admin"] > 300:
-        flask.session.clear()
-        return flask.redirect("/login")
-    flask.session["admin"] = int(time.time())
 
-    with open("last_update") as luFile:
-        last_update = "".join(luFile.readlines())
+    try:
+        with open("last_update") as luFile:
+            last_update = "".join(luFile.readlines())
+    except FileNotFoundError:
+        last_update = "Unknown"
+
     ballots = Votes.query.order_by(Votes.date_created).all()
     return flask.render_template("admin.html", config=config_dict,
                                  ballots=ballots,
                                  last_update=last_update)
 
+
+@app.route("/admin/update_site", methods=["POST"])
+@login_required
+def update_site():
+    os.system("bash ../update-site.sh")
+    return flask.redirect("/admin")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -181,15 +195,10 @@ def admin_de_auth():
 
 
 @app.route("/admin/toggleAcceptingResponses", methods=["POST"])
+@login_required
 def toggleAcceptingResponses():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
-    if "admin" not in flask.session:
-        return flask.redirect("/login")
-    if int(time.time()) - flask.session["admin"] > 300:
-        flask.session.clear()
-        return flask.redirect("/login")
-    flask.session["admin"] = int(time.time())
 
     config_dict["accepting"] = not(config_dict["accepting"])
     with open("config.json", "w") as configFile:
@@ -202,15 +211,10 @@ def toggleAcceptingResponses():
 
 
 @app.route("/admin/addName", methods=["POST"])
+@login_required
 def addName():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
-    if "admin" not in flask.session:
-        return flask.redirect("/login")
-    if int(time.time()) - flask.session["admin"] > 300:
-        flask.session.clear()
-        return flask.redirect("/login")
-    flask.session["admin"] = int(time.time())
 
     new_name = flask.request.form['candidateName']
     new_key = random.randint(0, 2147482647)
@@ -226,15 +230,10 @@ def addName():
 
 
 @app.route("/admin/addCodeword", methods=["POST"])
+@login_required
 def addCodeword():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
-    if "admin" not in flask.session:
-        return flask.redirect("/login")
-    if int(time.time()) - flask.session["admin"] > 300:
-        flask.session.clear()
-        return flask.redirect("/login")
-    flask.session["admin"] = int(time.time())
 
     new_code = flask.request.form['new_codeword']
     if new_code not in config_dict["codewords"]:
@@ -248,15 +247,10 @@ def addCodeword():
 
 
 @app.route("/admin/setNumber", methods=["POST"])
+@login_required
 def setNumber():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
-    if "admin" not in flask.session:
-        return flask.redirect("/login")
-    if int(time.time()) - flask.session["admin"] > 300:
-        flask.session.clear()
-        return flask.redirect("/login")
-    flask.session["admin"] = int(time.time())
 
     config_dict["rankNumCandidates"] = int(flask.request.form['numberCandidate'])
     with open("config.json", "w") as configFile:
@@ -268,15 +262,10 @@ def setNumber():
 
 
 @app.route("/admin/setMinNumber", methods=["POST"])
+@login_required
 def setMinNumber():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
-    if "admin" not in flask.session:
-        return flask.redirect("/login")
-    if int(time.time()) - flask.session["admin"] > 300:
-        flask.session.clear()
-        return flask.redirect("/login")
-    flask.session["admin"] = int(time.time())
 
     config_dict["minCandidates"] = int(flask.request.form['minNumberCandidate'])
     with open("config.json", "w") as configFile:
@@ -288,55 +277,40 @@ def setMinNumber():
 
 
 @app.route("/admin/delCan/<string:key>")
+@login_required
 def delCandidate(key):
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
-    if "admin" not in flask.session:
-        return flask.redirect("/login")
-    if int(time.time()) - flask.session["admin"] > 300:
-        flask.session.clear()
-        return flask.redirect("/login")
-    flask.session["admin"] = int(time.time())
 
     config_dict['candidates'].pop(key)
     with open("config.json", "w") as configFile:
         try:
             json.dump(config_dict, configFile)
-            return flask.redirect("/admin")
+            return flask.redirect("/admin#h3_candidates")
         except:
             return "There was an issue deleting the candidate name."
 
 
 @app.route("/admin/delCode/<string:code>")
+@login_required
 def delCodeword(code):
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
-    if "admin" not in flask.session:
-        return flask.redirect("/login")
-    if int(time.time()) - flask.session["admin"] > 300:
-        flask.session.clear()
-        return flask.redirect("/login")
-    flask.session["admin"] = int(time.time())
 
     config_dict['codewords'].remove(code)
     with open("config.json", "w") as configFile:
         try:
             json.dump(config_dict, configFile)
-            return flask.redirect("/admin")
+            return flask.redirect("/admin#h3_code_words")
         except:
             return "There was an issue deleting the candidate name."
 
 
 @app.route("/admin/delete_all_candidates")
+@login_required
 def delAllCandidates():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
-    if "admin" not in flask.session:
-        return flask.redirect("/login")
-    if int(time.time()) - flask.session["admin"] > 300:
-        flask.session.clear()
-        return flask.redirect("/login")
-    flask.session["admin"] = int(time.time())
 
     config_dict['candidates'].clear()
     with open("config.json", "w") as configFile:
@@ -348,15 +322,10 @@ def delAllCandidates():
 
 
 @app.route("/admin/update/<string:key>", methods=['GET', 'POST'])
+@login_required
 def renameCandidate(key):
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
-    if "admin" not in flask.session:
-        return flask.redirect("/login")
-    if int(time.time()) - flask.session["admin"] > 300:
-        flask.session.clear()
-        return flask.redirect("/login")
-    flask.session["admin"] = int(time.time())
 
     candidate_to_rename = config_dict['candidates'][key]
     if flask.request.method == "POST":
@@ -364,7 +333,7 @@ def renameCandidate(key):
         with open("config.json", "w") as configFile:
             try:
                 json.dump(config_dict, configFile)
-                return flask.redirect("/admin")
+                return flask.redirect("/admin#h3_candidates")
             except:
                 return "There was an issue renaming the candidate name."
     else:
@@ -372,15 +341,10 @@ def renameCandidate(key):
 
 
 @app.route("/admin/delVote/<int:key>")
+@login_required
 def delVote(key):
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
-    if "admin" not in flask.session:
-        return flask.redirect("/login")
-    if int(time.time()) - flask.session["admin"] > 300:
-        flask.session.clear()
-        return flask.redirect("/login")
-    flask.session["admin"] = int(time.time())
 
     vote_to_delete = Votes.query.get_or_404(key)
     try:
