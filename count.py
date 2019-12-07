@@ -3,6 +3,10 @@ import sqlalchemy.orm
 import sqlalchemy.ext
 import sqlalchemy.ext.declarative
 import datetime
+import json
+from stv import stv_main
+
+# %%
 
 engine = sqlalchemy.create_engine("sqlite:///votes.db")
 session = sqlalchemy.orm.sessionmaker(bind=engine)()
@@ -25,4 +29,20 @@ class Ballot(Base):
     def __repr__(self):
         return f"<{self.key}: {self.codeword}, {self.candidate_order}, {self.date_created}>"
 
-votes = session.query(Ballot.candidate_order).all()
+# %%
+
+ballots = [x[0].split(',') for x in session.query(Ballot.candidate_order).all()]
+
+with open("config.json", "r") as configFile:
+    config_dict = json.load(configFile)
+candidates = dict(zip(config_dict["candidates"].keys(),
+                  range(len(config_dict["candidates"].keys()))))
+
+elected, vote_count, log = stv_main(ballots_raw=ballots,
+                                    numWinners=2,
+                                    candidates=candidates,
+                                    notDroop=1)
+
+for candidate, round, score in elected:
+    print(f"{config_dict['candidates'][candidate]}\n\t",
+          f"Victory in round {round}, with a score of {score}.")

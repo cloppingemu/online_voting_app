@@ -37,6 +37,7 @@ import sys
 import math
 import csv
 import argparse
+from io import StringIO
 
 SVT_LOGGER = 'SVT'
 LOGGER_FORMAT = '%(message)s'
@@ -366,6 +367,30 @@ def count_stv(ballots, seats, droop = True, constituencies = None,
         current_round += 1
 
     return elected, vote_count
+
+
+def stv_main(ballots_raw:list, numWinners:int,
+             candidates:dict, random=None, notDroop=1):
+    log_stream = StringIO()
+    stream_handler = logging.StreamHandler(stream=log_stream)
+    logger = logging.getLogger(SVT_LOGGER)
+    logger.setLevel("DEBUG")
+    logger.addHandler(stream_handler)
+
+    ballots = []
+    for ballot in ballots_raw:
+        ballots.append(Ballot(ballot))
+    quota = 0
+
+    (elected, vote_count) = count_stv(ballots, numWinners, notDroop,
+                                      candidates, quota_limit=0,
+                                      rnd_gen=random)
+
+    # for result in elected:
+    #     print(result)
+
+    return (elected, vote_count, log_stream.getvalue())
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Perform STV')
