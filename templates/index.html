@@ -19,7 +19,7 @@
     {% if candidates|length < 1 %}
         <h3>There are currently no candidates.</h3>
     {% else %}
-    <table class="ordered">
+    <table class="unordered">
             <tr>
                 <th>Rank</th>
                 <th>Candidate Name</th>
@@ -66,7 +66,7 @@
     {% endwith %}
 
     <h3 id="candidate_list">Candidates</h3>
-    <table class="ordered">
+    <table class="unordered">
         {% for i, (key,name) in candidates %}
             {% if not ((i)%3) %}
                 <tr>

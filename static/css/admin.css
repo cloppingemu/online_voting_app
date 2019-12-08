@@ -1,11 +1,6 @@
-table.ordered {
-    border-collapse: collapse;
-    width: 1000px;
-}
-
 table.unordered {
     border-collapse: collapse;
-    width: 100%;
+    width: 75%;
 }
 
 th{

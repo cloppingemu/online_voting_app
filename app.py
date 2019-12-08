@@ -11,9 +11,8 @@ from stv import stv_main
 
 # %% app base
 
-__app_version__ = "1.0.0"
+__app_version__ = "1.1.0"
 salt_base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
-
 
 def passwd_hash(ascii, salt, n=1500):
     digest = hashlib.sha256((ascii+salt).encode()).hexdigest()
@@ -51,6 +50,7 @@ def create_new_pass_config(passwd, passwd_salt=None, local_salt=None):
 app = flask.Flask(__name__)
 app.config["SECRET_KEY"] = "".join([random.choice(salt_base) for _ in range(128)])
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///votes.db"
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
 # %% models
@@ -66,22 +66,22 @@ class Votes(db.Model):
         return "<Vote, codeword:{}, candidate_order:{}, date_created:{}>".format(self.codeword, self.candidate_order, self.date_created)
 
 
-# %% route
+# %% routing
 
-
-def login_required(func):
-    @wraps(func)
-    def inner(*args, **kwargs):
-        if "admin" not in flask.session:
-            flask.flash('You need to login first')
-            return flask.redirect("/login")
-        if int(time.time()) - flask.session["admin"] > 300:
-            flask.session.clear()
-            flask.flash("!! Time out")
-            return flask.redirect("/login")
-        flask.session["admin"] = int(time.time())
-        return func(*args, **kwargs)
-    return inner
+def login_required(route):
+    def outer(func):
+        @wraps(func)
+        def inner(*args, **kwargs):
+            if "admin" not in flask.session:
+                flask.flash('You need to login first')
+                return flask.redirect("/login")
+            if int(time.time()) - flask.session["admin"][0] > 300:
+                flask.flash("!! Time-out")
+                return flask.redirect("/login")
+            flask.session["admin"] = [int(time.time()), route]
+            return func(*args, **kwargs)
+        return inner
+    return outer
 
 
 @app.route("/", methods=["POST", "GET"])
@@ -125,7 +125,7 @@ def voted():
 
 
 @app.route("/admin")
-@login_required
+@login_required("/admin")
 def admin():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -143,7 +143,7 @@ def admin():
 
 
 @app.route("/admin/results")
-@login_required
+@login_required("/admin/results")
 def count_votes():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -177,7 +177,7 @@ def count_votes():
 
 
 @app.route("/admin/update_site", methods=["POST"])
-@login_required
+@login_required("/admin/update_site")
 def update_site():
     os.system("bash ../update-site.sh")
     return flask.redirect("/admin")
@@ -217,8 +217,11 @@ def admin_auth():
         else:
             local_hash = passwd_hash(flask.request.form["salted_passwd"], config_dict["local_salt"])
             if local_hash == config_dict["passwd"]:
-                flask.session["admin"] = int(time.time())
-                return flask.redirect("/admin")
+                if "admin" in flask.session:
+                    flask.session["admin"] = [int(time.time()), flask.session["admin"][1]]
+                else:
+                    flask.session["admin"] = [int(time.time()), "/admin"]
+                return flask.redirect(flask.session["admin"][1])
             else:
                 flask.flash("!! Incorrect password")
                 return flask.redirect("/login")
@@ -231,7 +234,7 @@ def admin_de_auth():
 
 
 @app.route("/admin/toggleAcceptingResponses", methods=["POST"])
-@login_required
+@login_required("/admin/toggleAcceptingResponses")
 def toggleAcceptingResponses():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -247,7 +250,7 @@ def toggleAcceptingResponses():
 
 
 @app.route("/admin/addName", methods=["POST"])
-@login_required
+@login_required("/admin")
 def addName():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -266,7 +269,7 @@ def addName():
 
 
 @app.route("/admin/addCodeword", methods=["POST"])
-@login_required
+@login_required("/admin")
 def addCodeword():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -283,7 +286,7 @@ def addCodeword():
 
 
 @app.route("/admin/setNumber", methods=["POST"])
-@login_required
+@login_required("/admin")
 def setNumber():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -298,7 +301,7 @@ def setNumber():
 
 
 @app.route("/admin/setNumWinners", methods=["POST"])
-@login_required
+@login_required("/admin")
 def setNumWinners():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -313,7 +316,7 @@ def setNumWinners():
 
 
 @app.route("/admin/setMinNumber", methods=["POST"])
-@login_required
+@login_required("/admin")
 def setMinNumber():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -328,7 +331,7 @@ def setMinNumber():
 
 
 @app.route("/admin/delCan/<string:key>")
-@login_required
+@login_required("/admin/delCan/<string:key>")
 def delCandidate(key):
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -343,7 +346,7 @@ def delCandidate(key):
 
 
 @app.route("/admin/delCode/<string:code>")
-@login_required
+@login_required("/admin/delCode/<string:code>")
 def delCodeword(code):
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -358,7 +361,7 @@ def delCodeword(code):
 
 
 @app.route("/admin/delete_all_candidates")
-@login_required
+@login_required("/admin/delete_all_candidates")
 def delAllCandidates():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -373,7 +376,7 @@ def delAllCandidates():
 
 
 @app.route("/admin/update/<string:key>", methods=['GET', 'POST'])
-@login_required
+@login_required("/admin/update/<string:key>")
 def renameCandidate(key):
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -392,7 +395,7 @@ def renameCandidate(key):
 
 
 @app.route("/admin/delVote/<int:key>")
-@login_required
+@login_required("/admin/delVote/<int:key>")
 def delVote(key):
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -407,5 +410,5 @@ def delVote(key):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
 

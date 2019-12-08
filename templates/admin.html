@@ -34,7 +34,7 @@
     <br />
     <hr class="page"/>
 
-    <h3 id="hr_update_site" style="display:inline">Update website to:</h3> <a href="https://github.com/cloppingemu/online_voting_app">https://github.com/cloppingemu/online_voting_app</a>
+    <h3 id="hr_update_site" style="display:inline">Update website: to</h3> <a href="https://github.com/cloppingemu/online_voting_app">https://github.com/cloppingemu/online_voting_app</a>
     <p><b>Last updated:</b> {{last_update}}</p>
     <form action="/admin/update_site" method="POST">
         <button type="submit">Update site</button>
@@ -42,7 +42,7 @@
     <br /><br />
     <hr class="page"/>
 
-    <h3 id="h3_candidates">Candidates</h3>
+    <h3 style="display:inline" id="h3_candidates">Candidates</h3>: {{ config["candidates"]|length }} <br /><br />
     <form action="/admin/addName" onsubmit="return validate('candidateName', 'Name field empty')" name="addCandidateForm" method="POST">
         <input type="text" name="candidateName" id="candidateName" tabindex=1>
         <input type="submit" value="Add candidate" tabindex=2>
@@ -52,7 +52,7 @@
     {% if config['candidates']|length < 1 %}
         <b>There are currently no candidates.</b>
     {% else %}
-    <table class="ordered">
+    <table class="unordered">
             <tr>
                 <th>Candidate Name</th>
                 <th>Actions</th>
@@ -71,7 +71,7 @@
     <br /> <br />
     <hr class="page"/>
 
-    <h3 id="h3_code_words">Code-words</h3>
+    <h3 style="display:inline" id="h3_code_words">Code words</h3>: {{ config['codewords']|length }} <br /><br />
     <form action="/admin/addCodeword" onsubmit="return validate('new_codeword', 'New codeword empty')" method="POST">
         <input type="text" name="new_codeword" id="new_codeword" tabindex=3>
         <input type="submit" value="Add codeword" tabindex=4>
@@ -81,7 +81,7 @@
     {% if config['codewords']|length < 1 %}
         <b>There are currently no codewords.</b>
     {% else %}
-    <table class="ordered">
+    <table class="unordered">
             <tr>
                 <th>Codeword</th>
                 <th>Actions</th>
