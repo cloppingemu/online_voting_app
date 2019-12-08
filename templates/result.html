@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+
+{% block head %}
+<title>Result Page</title>
+<link rel="stylesheet" type="text/css" href="../static/css/admin.css">
+{% endblock %}
+
+
+{% block body %}
+    <div class="votes">
+    <h1 style="display:inline">Co-op elections page</h1>
+    <object align="right"><a href="/">< Home</a> &nbsp; <a href="/admin">Admin ></a></object>
+    <hr class="top"/>
+    
+    <br />
+    <h2>Candidates</h2>
+    {{ candidates|safe }}
+
+    <br /><br />
+    <h2>Winners</h2>
+    <table class="ordered">
+        <tr>
+            <th>Candidate Name</th>
+            <th>Round</th>
+            <th>Score</th>
+        </tr>
+
+        {% for num,round,score in elected %}
+            <tr>
+                <td>{{ config_dict["candidates"][num] }}</td>
+                <td>{{ round }}</td>
+                <td>{{ score|float }}</td>
+            </tr>
+        {% endfor %}
+
+    </table>
+
+    <br /><br />
+    <h2>Vote count</h2>
+    {{ vote_count|safe }}
+
+    <br /> <br />
+    <h2>Count log</h2>
+    {{ count_log|safe }}
+
+    <hr class="page"/>
+    <p align="right" style="color:#ffffff;font-size:small;">Counting algorithm used: <a href="https://github.com/louridas/stv" style="color:#ffffff;font-size:small;">https://github.com/louridas/stv</a> </p>
+
+
+</body>
+{% endblock %}

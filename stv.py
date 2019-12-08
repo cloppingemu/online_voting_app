@@ -386,9 +386,6 @@ def stv_main(ballots_raw:list, numWinners:int,
                                       candidates, quota_limit=0,
                                       rnd_gen=random)
 
-    # for result in elected:
-    #     print(result)
-
     return (elected, vote_count, log_stream.getvalue())
 
 

@@ -7,3 +7,4 @@ wsgi.py
 app.yaml
 ballots.csv
 constituencies.csv
+count.py

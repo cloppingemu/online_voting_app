@@ -6,10 +6,12 @@ import flask
 from flask_sqlalchemy import SQLAlchemy
 import datetime, time
 from functools import wraps
+from stv import stv_main
+
 
 # %% app base
 
-__app_version__ = "0.1.4"
+__app_version__ = "1.0.0"
 salt_base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 
@@ -64,12 +66,7 @@ class Votes(db.Model):
         return "<Vote, codeword:{}, candidate_order:{}, date_created:{}>".format(self.codeword, self.candidate_order, self.date_created)
 
 
-# %%
-
-
-
-
-# %%
+# %% route
 
 
 def login_required(func):
@@ -143,6 +140,40 @@ def admin():
     return flask.render_template("admin.html", config=config_dict,
                                  ballots=ballots,
                                  last_update=last_update)
+
+
+@app.route("/admin/results")
+@login_required
+def count_votes():
+    with open("config.json", "r") as configFile:
+        config_dict = json.load(configFile)
+    candidates = dict(zip(config_dict["candidates"].keys(),
+                range(len(config_dict["candidates"].keys()))))
+    ballots = [item[0].split(',') for item in
+               db.session.query(Votes.candidate_order).all()]
+
+    elected, vote_count, log = stv_main(ballots_raw=ballots,
+        numWinners=config_dict["num_winners"], candidates=candidates,
+        notDroop=1)
+
+    candidates = dict([(num, f"<b>{name}</b>") for num,name in
+                      config_dict["candidates"].items()])
+    candidates = (str(candidates)[1:-1]
+                  .replace(',', '; &nbsp;')
+                  .replace("'", ""))
+    vote_count = (str(dict([("<b>"+config_dict["candidates"][number]+"</b>", float(vote))
+                            for number, vote in vote_count.items()]))
+                      .replace("'", "")
+                      .replace(",", "; &nbsp;")[1:-1])
+
+    return flask.render_template("result.html",
+        candidates=candidates,
+        count_log=(log.replace("@ROUND", "<br /> @ROUND")
+                      .replace("\n", "<br />")
+                      .replace(";", "; ")),
+        elected=elected,
+        vote_count=vote_count,
+        config_dict=config_dict)
 
 
 @app.route("/admin/update_site", methods=["POST"])
@@ -262,6 +293,21 @@ def setNumber():
         try:
             json.dump(config_dict, configFile)
             return flask.redirect("/admin#num_cndt_rnk")
+        except:
+            return "There was an issue updating the parameter."
+
+
+@app.route("/admin/setNumWinners", methods=["POST"])
+@login_required
+def setNumWinners():
+    with open("config.json", "r") as configFile:
+        config_dict = json.load(configFile)
+
+    config_dict["num_winners"] = int(flask.request.form['numWinners'])
+    with open("config.json", "w") as configFile:
+        try:
+            json.dump(config_dict, configFile)
+            return flask.redirect("/admin#h3_num_winners")
         except:
             return "There was an issue updating the parameter."
 

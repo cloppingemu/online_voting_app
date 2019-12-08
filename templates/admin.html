@@ -99,7 +99,7 @@
     <br /> <br />
     <hr class="page"/>
 
-    <h3 id="num_cndt_rnk">Number of candidates to rank: {{config["rankNumCandidates"]}}</h3>
+    <h3 style="display:inline"  id="num_cndt_rnk">Number of candidates to rank</h3>: {{config["rankNumCandidates"]}} <br /><br />
     <form action="/admin/setNumber" onsubmit="return validate('numberCandidate', 'Number field empty')" name="numberCandidatesToRank" method="POST">
         <input type="number" name="numberCandidate" id="numberCandidate" value={{config["rankNumCandidates"]}}>
         <input type="submit" value="Set number to rank">
@@ -107,7 +107,7 @@
     <br /> <br />
     <hr class="page"/>
 
-    <h3 id="min_num_candt_rnk">Minimum number of candidates to rank: {{config["minCandidates"]}}</h3>
+    <h3 style="display:inline"  id="min_num_candt_rnk">Minimum number of candidates to rank</h3>: {{config["minCandidates"]}} <br /><br />
     <form action="/admin/setMinNumber" onsubmit="return validate('minNumberCandidate', 'Minimum number field empty')" name="minNumberCandidatesToRank" method="POST">
         <input type="number" name="minNumberCandidate" id="minNumberCandidate" value={{config["minCandidates"]}}>
         <input type="submit" value="Set minimum number to rank">
@@ -115,7 +115,15 @@
     <br /><br />
     <hr class="page"/>
 
-    <h3 style="display:inline" id="casted_ballots">Casted ballots</h3>
+    <h3 style="display:inline" id="h3_num_winners">Minimum number of winners</h3>: {{config["num_winners"]}} <br /><br />
+    <form action="/admin/setNumWinners" onsubmit="return validate('numWinners', 'Number of winners field empty')" method="POST">
+        <input type="number" name="numWinners" id="numWinners" value={{config["num_winners"]}}>
+        <input type="submit" value="Set minimum number to rank">
+    </form>
+    <br /><br />
+    <hr class="page"/>
+
+    <h3 style="display:inline" id="casted_ballots">Casted ballots</h3>: {{ballots|length}} votes <br /><br />
     {% if ballots|length >= 1 %}
         <table class="unordered">
             <tr>
