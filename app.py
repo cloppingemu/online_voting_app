@@ -72,7 +72,7 @@ def login_required(route):
     def outer(func):
         @wraps(func)
         def inner(*args, **kwargs):
-            TIMEOUT = 5
+            TIMEOUT = 300
             if "admin" not in flask.session:
                 flask.session["admin"] = [-TIMEOUT, route]
                 flask.flash('You need to login first')
