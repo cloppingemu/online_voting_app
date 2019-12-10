@@ -11,7 +11,7 @@ from stv import stv_main
 
 # %% app base
 
-__app_version__ = "1.1.0"
+__app_version__ = "1.2.0: Final"
 salt_base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 def passwd_hash(ascii, salt, n=1500):
@@ -72,14 +72,18 @@ def login_required(route):
     def outer(func):
         @wraps(func)
         def inner(*args, **kwargs):
+            TIMEOUT = 5
             if "admin" not in flask.session:
+                flask.session["admin"] = [-TIMEOUT, route]
                 flask.flash('You need to login first')
                 return flask.redirect("/login")
-            if int(time.time()) - flask.session["admin"][0] > 300:
+            elif int(time.time()) - flask.session["admin"][0] > TIMEOUT:
+                flask.session['admin'][1] = route
                 flask.flash("!! Time-out")
                 return flask.redirect("/login")
-            flask.session["admin"] = [int(time.time()), route]
-            return func(*args, **kwargs)
+            else:
+                flask.session["admin"] = [int(time.time()), route]
+                return func(*args, **kwargs)
         return inner
     return outer
 
@@ -161,10 +165,12 @@ def count_votes():
     candidates = (str(candidates)[1:-1]
                   .replace(',', '; &nbsp;')
                   .replace("'", ""))
-    vote_count = (str(dict([("<b>"+config_dict["candidates"][number]+"</b>", float(vote))
-                            for number, vote in vote_count.items()]))
+    vote_count = (str(sorted([("<b>"+config_dict["candidates"][number]+"</b>",
+                              float(vote))
+                              for number, vote in vote_count.items()],
+                             key=lambda x: -x[1]))
                       .replace("'", "")
-                      .replace(",", "; &nbsp;")[1:-1])
+                      .replace("),", "); &nbsp;")[1:-1])
 
     return flask.render_template("result.html",
         candidates=candidates,
@@ -410,5 +416,5 @@ def delVote(key):
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=False)
 
