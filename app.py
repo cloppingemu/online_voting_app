@@ -183,7 +183,7 @@ def count_votes():
 
 
 @app.route("/admin/update_site", methods=["POST"])
-@login_required("/admin/update_site")
+@login_required("/admin")
 def update_site():
     os.system("bash ../update-site.sh")
     return flask.redirect("/admin")
@@ -240,7 +240,7 @@ def admin_de_auth():
 
 
 @app.route("/admin/toggleAcceptingResponses", methods=["POST"])
-@login_required("/admin/toggleAcceptingResponses")
+@login_required("/admin")
 def toggleAcceptingResponses():
     with open("config.json", "r") as configFile:
         config_dict = json.load(configFile)
@@ -416,5 +416,5 @@ def delVote(key):
 
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
 
