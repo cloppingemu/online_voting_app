@@ -22,7 +22,7 @@
 
 {% block body %}
 <body>
-    <h1 style="display:inline">Co-op election admin page</h1>
+    <h1 style="display:inline"><a href="/" style="text-decoration:none">Co-op elections</a> admin page</h1>
     <object align="right"><a href="/logout">Logout</a></object><object align="right"><a href="/">< Home</a>&nbsp;&nbsp;</object>
     <hr class="top"/>
     <div class="candidates">
@@ -115,10 +115,10 @@
     <br /><br />
     <hr class="page"/>
 
-    <h3 style="display:inline" id="h3_num_winners">Minimum number of winners</h3>: {{config["num_winners"]}} <br /><br />
+    <h3 style="display:inline" id="h3_num_winners">Number of winners</h3>: {{config["num_winners"]}} <br /><br />
     <form action="/admin/setNumWinners" onsubmit="return validate('numWinners', 'Number of winners field empty')" method="POST">
         <input type="number" name="numWinners" id="numWinners" value={{config["num_winners"]}}>
-        <input type="submit" value="Set minimum number to rank">
+        <input type="submit" value="Set number of winners">
     </form>
     <br /><br />
     <hr class="page"/>
