@@ -11,7 +11,7 @@ from stv import stv_main
 
 # %% app base
 
-__app_version__ = "1.2.0: Final"
+__app_version__ = "1.3.0: Not so final... yet!!"
 salt_base = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_"
 
 def passwd_hash(ascii, salt, n=1500):
