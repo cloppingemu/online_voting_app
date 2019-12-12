@@ -96,7 +96,7 @@ def index():
         return flask.render_template("voting_closed.html",
             current_year=datetime.datetime.utcnow().year)
     if flask.request.method == "POST":
-        ballot_codeword = flask.request.form["ballotCodeword"]
+        ballot_codeword = flask.request.form["ballotCodeword"].lower()
         if ballot_codeword not in config_dict['codewords']:
             flask.flash("!! Bad codeword")
             return flask.redirect("/")

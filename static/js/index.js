@@ -18,7 +18,7 @@ function removeVote(){
         document.getElementById("rank"+(i-1)).innerHTML = "";
         considered.pop()
         i--;
-        document.getElementById("ballot").value = String(considered)
+        document.getElementById("ballot").value = String(considered);
     }
     else{
         document.getElementById("alert_area2").innerHTML = ("!! " + "Underflow attempted");
@@ -33,7 +33,7 @@ function removeAllVotes(numCan){
     }
     i = 1;
     considered = [];
-    document.getElementById("ballot").value = String(considered)
+    document.getElementById("ballot").value = String(considered);
 }
 
 function validate(fieldId, validationAlert){
@@ -57,3 +57,28 @@ function validateVotes(message, minNum){
     }
 }
 
+
+function moveRank(rank, directionUp){
+    if (document.getElementById("rank"+String(rank+1)).innerHTML != ""){
+        if (directionUp){
+            temp = considered[rank-1]
+            considered[rank-1] = considered[rank]
+            considered[rank] = temp
+
+            temp = document.getElementById("rank" + String(rank)).innerHTML;
+            document.getElementById("rank" + String(rank)).innerHTML = document.getElementById("rank" + String(rank+1)).innerHTML;
+            document.getElementById("rank" + String(rank+1)).innerHTML = temp;
+        }else{
+            if (document.getElementById("rank"+String(rank+2)).innerHTML != ""){
+                temp = considered[rank+1]
+                considered[rank+1] = considered[rank]
+                considered[rank] = temp
+
+                temp = document.getElementById("rank" + String(rank+2)).innerHTML;
+                document.getElementById("rank" + String(rank+2)).innerHTML = document.getElementById("rank" + String(rank+1)).innerHTML;
+                document.getElementById("rank" + String(rank+1)).innerHTML = temp;
+            }
+        }
+    }
+    document.getElementById("ballot").value = String(considered)
+}

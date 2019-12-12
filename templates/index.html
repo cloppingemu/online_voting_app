@@ -23,12 +23,16 @@
             <tr>
                 <th>Rank</th>
                 <th>Candidate Name</th>
+                <th>Action</th>
+                <th></th>
             </tr>
 
             {% for i in range(numCandidate) %}
                 <tr>
                     <td>{{i+1}}</td>
                     <td id="rank{{i+1}}"></td>
+                    <td style="width:100px;" onclick="moveRank({{i}}, {{1}})">{% if i != 0 %}<a href="#">Raise</a> {% endif %}</td>
+                    <td style="width:100px;" onclick="moveRank({{i}}, {{0}})">{% if i != numCandidate-1 %} <a href="#">Lower</a> {% endif %}</td>
                 </tr>
             {% endfor %}
 
