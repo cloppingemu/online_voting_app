@@ -49,9 +49,7 @@
     <form action="/admin/addName" onsubmit="return validate('candidateName', 'Name field empty')" name="addCandidateForm" method="POST">
         <input type="text" name="candidateName" id="candidateName" tabindex=1>
         <input type="submit" value="Add candidate" tabindex=2>
-    </form>
-    <a href="/admin/delete_all_candidates">Delete All Candidates</a>
-    <br /><br />
+    </form><br />
     {% if config['candidates']|length < 1 %}
         <b>There are currently no candidates.</b>
     {% else %}
