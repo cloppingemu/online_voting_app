@@ -49,7 +49,9 @@
     <form action="/admin/addName" onsubmit="return validate('candidateName', 'Name field empty')" name="addCandidateForm" method="POST">
         <input type="text" name="candidateName" id="candidateName" tabindex=1>
         <input type="submit" value="Add candidate" tabindex=2>
-    </form><br />
+    </form>
+    <a href="/admin/delete_all_candidates">Delete All Candidates</a>
+    <br /><br />
     {% if config['candidates']|length < 1 %}
         <b>There are currently no candidates.</b>
     {% else %}
@@ -76,9 +78,7 @@
     <form action="/admin/addCodeword" onsubmit="return validate('new_codeword', 'New codeword empty')" method="POST">
         <input type="text" name="new_codeword" id="new_codeword" tabindex=3>
         <input type="submit" value="Add codeword" tabindex=4>
-    </form>
-    <a href="/admin/delete_all_candidates">Delete All Candidates</a>
-    <br /><br />
+    </form><br />
     {% if config['codewords']|length < 1 %}
         <b>There are currently no codewords.</b>
     {% else %}
