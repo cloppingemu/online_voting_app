@@ -1,2 +1,3 @@
-# online_voting_app
-Online voting app with flask/python
+# Basic flask preferential voting system
+
+Online voting app with flask/python. Available at http://cloppingemu.pythonanywhere.com
